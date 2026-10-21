@@ -1,25 +1,48 @@
 Description
-  A bash script for Ubuntu to install AmneziaWG 2.0 and generate some interface configuration files for all platforms automatically (Dual-stack supported).
+  A bash script for Ubuntu to install AmneziaWG 3.1 and generate some interface configuration files for all platforms automatically (Dual-stack supported).
 
 Obfuscation Parameters
-  S1: 0 <= S1 <= 64, len(init) = 148 + S1, S1 + 56 != S2, recommended range is from 15 to 64 inclusive, default 20.
-  S2: 0 <= S2 <= 64, len(resp) = 92 + S2, recommended range is from 15 to 64 inclusive, default 50.
-  S3: 0 <= S3 <= 64, len(cookie) = 64 + S3, default 30.    // AmneziaWG 2.0 parameter
-  S4: 0 <= S4 <= 32, len(data) = payload + S4, default 15. // AmneziaWG 2.0 parameter
-  H1: UInt32, default 100000-200000.                       // AmneziaWG 2.0 parameter
-  H2: UInt32, default 3000000-4000000.                     // AmneziaWG 2.0 parameter
-  H3: UInt32, default 50000000-60000000.                   // AmneziaWG 2.0 parameter
-  H4: UInt32, default 700000000-800000000.                 // AmneziaWG 2.0 parameter
+  S1: 12 <= S1 <= 64, len(init) = 148 + S1, S1 + 56 != S2, recommended range is from 15 to 64 inclusive, default 20.
+  S2: 12 <= S2 <= 64, len(resp) = 92 + S2, recommended range is from 15 to 64 inclusive, default 20.
+  S3: 12 <= S3 <= 64, len(cookie) = 64 + S3, default 20.                                                                               // AmneziaWG 2.0 parameter
+  S4: 12 <= S4 <= 32, len(data) = payload + S4, default 20.                                                                            // AmneziaWG 2.0 parameter
+  H1: Range<UInt32>, default 1.                                                                                                        // AmneziaWG 2.0 parameter
+  H2: Range<UInt32>, default 2.                                                                                                        // AmneziaWG 2.0 parameter
+  H3: Range<UInt32>, default 3.                                                                                                        // AmneziaWG 2.0 parameter
+  H4: Range<UInt32>, default 4.                                                                                                        // AmneziaWG 2.0 parameter
   I1: Format <b hex_data>, default <r 128> or <b 0x100101000>.
-  I2-I5: Optional.
-  Jc: 1 <= Jc <= 128, recommended range is from 4 to 10 inclusive, default 5.
-  Jmin: 0 < Jmin < Jmax, Jmin < 1280(*), recommended range is from 64 to 1024 inclusive, default 65.
-  Jmax: 0 < Jmin < Jmax <= 1280(*), recommended range is from 64 to 1024 inclusive, default 250.
+  I2-I5: Format <b hex_data>, optional.
+  Jc: Number of junk packets. 1 <= Jc <= 128, recommended range is from 4 to 10 inclusive, default 5.
+  Jmin: Minimum junk packet size. 0 < Jmin < Jmax, Jmin < 1280(*), recommended range is from 64 to 1024 inclusive, default 65.
+  Jmax: Maximum junk packet size. 0 < Jmin < Jmax <= 1280(*), recommended range is from 64 to 1024 inclusive, default 250.
+  HeaderProtectionKey: Key for Header Protection. 32 byte key, using `awg genkey` command.                                             // AmneziaWG 3.0 parameter
+  ContentPaddingAddition: Random addition to the transport payload. Range<UInt16>, default 0-16.                                       // AmneziaWG 3.0 parameter
+  RekeyAfterTime: Interval before re-handshake. Range<UInt16>, optional(0-0).                                                          // AmneziaWG 3.0 parameter
+  RekeyTimeout: Handshake timeout. Range<UInt16>, optional(0-0).                                                                       // AmneziaWG 3.0 parameter
+  RejectAfterTime: Interval after which the connection initiates a new handshake if no data is received. Range<UInt16>, optional(0-0). // AmneziaWG 3.0 parameter
+  KeepaliveTimeout: Interval before sending keepalive. Range<UInt16>, optional(0-0).                                                   // AmneziaWG 3.0 parameter
+  MaxHandshakeAttempts: Maximum number of handshake retries. Range<UInt16>, optional(0-0).                                             // AmneziaWG 3.0 parameter
+  RandomTrailers: Adds random trailers to packets. on/off, default on.                                                                 // AmneziaWG 3.1 parameter
+  DisableCookies: Disables sending Cookie Reply. on/off, default off.                                                                  // AmneziaWG 3.1 parameter
 
   Note
-    - H1/H2/H3/H4: Must be unique among each other, recommended range is from 5 to 2,147,483,647 inclusive.
-    - I1-I5: Details, look at the site (https://docs.amnezia.org/documentation/amnezia-wg/#how-it-works).
+    - S1-S5: Random prefixes for Init, Response, Cookie, and Data.
+    - H1-H4: Custom message type identifiers. Must be unique among each other, recommended range is from 5 to 2,147,483,647 inclusive.
+    - I1-I5: Obfuscation packets before handshake.
+    - When using Header Protection, it is recommended to leave H1-H4 at the standard compatibility values: H1 = 1, H2 = 2, H3 = 3, H4 = 4. In this mode, the custom header mechanism is disabled, and the message type is hidden by Header Protection.
+    - Header Protection is applied to the following parts of packets after Sx:
+
+        Init     - 148 bytes
+        Response - 92 bytes
+        Cookie   - 64 bytes
+        Data     - 16 bytes
+
+    - To use Header Protection, S1-S4 values must be at least 12 bytes, and HeaderProtectionKey must be set.
+    - When using RandomTrailers, it is recommended to set the same values for S1, S2, S3, and S4. This reduces the risk of incorrect packet type detection. This is because packets have random sizes and may be interpreted incorrectly.
+    - The DisableCookies parameter disables only the sending of Handshake Cookie Reply messages. Incoming cookie messages and other cookie-related mechanisms continue to work the same way as in the original WireGuard implementation.
+    - If a mechanism's value is 0, off, or the 0-0 range, the mechanism is disabled and standard WireGuard behavior is used.
+    - Details, please look at the site (https://docs.amnezia.org/documentation/amnezia-wg/#how-it-works).
     - (*) Assuming a basic internet connection with an MTU value of 1280.
 
 "WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld (https://zx2c4.com).
-AmneziaWG 2.0 is based on WireGuard, changes and modifications made by Amnezia Organization (https://amnezia.org).
+AmneziaWG 3.1 is based on WireGuard, changes and modifications made by Amnezia Organization (https://amnezia.org).
