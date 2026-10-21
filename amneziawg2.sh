@@ -74,7 +74,7 @@ function generate_awg_ifs() {
 
         generate_server_awg_if
         generate_client_awg_if
-        chmod -R 400 SERVER_AWG_IF_CONF_ROOT_DIR
+        chmod -R 400 ${SERVER_AWG_IF_CONF_ROOT_DIR}
 
         echo ${SERVER_AWG_IF_CONF}
         echo ${CLIENT_AWG_IF_CONF}
@@ -214,7 +214,7 @@ PresharedKey = ${CLIENT_PRESHARED_KEY}
 AllowedIPs = ${CLIENT_AWG_IPV4}/32, ${CLIENT_AWG_IPV6}/128
 EOF
         done
-        chmod -R 400 SERVER_AWG_IF_CONF_ROOT_DIR
+        chmod -R 400 ${SERVER_AWG_IF_CONF_ROOT_DIR}
         exit 0
     else
         echo "ERROR: No such files!"
