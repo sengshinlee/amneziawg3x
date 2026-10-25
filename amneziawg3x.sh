@@ -56,6 +56,7 @@ function generate_awg_ifs() {
 
         local SERVER_AWG_NIC="awg0"
         local SERVER_AWG_PORT="51820"
+        local SERVER_AWG_HEADER_PROTECTION_KEY="$(awg genkey)"
         local AWG_MTU="1280"
 
         local SERVER_AWG_IF_CONF="${SERVER_AWG_IF_CONF_ROOT_DIR}/${SERVER_AWG_NIC}.conf"
@@ -93,17 +94,26 @@ Address = ${SERVER_AWG_IPV4}/32, ${SERVER_AWG_IPV6}/128
 ListenPort = ${SERVER_AWG_PORT}
 MTU = ${AWG_MTU}
 S1 = 20
-S2 = 50
-S3 = 30
-S4 = 15
-H1 = 100000-200000
-H2 = 3000000-4000000
-H3 = 50000000-60000000
-H4 = 700000000-800000000
+S2 = 20
+S3 = 20
+S4 = 20
+H1 = 1
+H2 = 2
+H3 = 3
+H4 = 4
 I1 = <r 128>
 Jc = 5
 Jmin = 65
 Jmax = 250
+HeaderProtectionKey = ${SERVER_AWG_HEADER_PROTECTION_KEY}
+ContentPaddingAddition = 0-16
+RekeyAfterTime = 0-0
+RekeyTimeout = 0-0
+RejectAfterTime = 0-0
+KeepaliveTimeout = 0-0
+MaxHandshakeAttempts = 0-0
+RandomTrailers = on
+DisableCookies = off
 PreUp = sysctl -w net.ipv4.ip_forward=1 >/dev/null 2>&1
 PreUp = sysctl -w net.ipv6.conf.all.forwarding=1 >/dev/null 2>&1
 PreUp = sysctl -w net.core.default_qdisc=fq >/dev/null 2>&1
@@ -149,17 +159,26 @@ DNS = 1.1.1.1, 1.0.0.1, 1.1.1.2, 1.0.0.2, 1.1.1.3, 1.0.0.3
 DNS = 2606:4700:4700::1111, 2606:4700:4700::1001, 2606:4700:4700::1112, 2606:4700:4700::1002, 2606:4700:4700::1113, 2606:4700:4700::1003
 MTU = ${AWG_MTU}
 S1 = 20
-S2 = 50
-S3 = 30
-S4 = 15
-H1 = 100000-200000
-H2 = 3000000-4000000
-H3 = 50000000-60000000
-H4 = 700000000-800000000
+S2 = 20
+S3 = 20
+S4 = 20
+H1 = 1
+H2 = 2
+H3 = 3
+H4 = 4
 I1 = <r 128>
 Jc = 5
 Jmin = 65
 Jmax = 250
+HeaderProtectionKey = ${SERVER_AWG_HEADER_PROTECTION_KEY}
+ContentPaddingAddition = 0-16
+RekeyAfterTime = 0-0
+RekeyTimeout = 0-0
+RejectAfterTime = 0-0
+KeepaliveTimeout = 0-0
+MaxHandshakeAttempts = 0-0
+RandomTrailers = on
+DisableCookies = off
 
 [Peer]
 PublicKey = ${SERVER_PUBLIC_KEY}
@@ -242,7 +261,7 @@ function remove() {
 function help() {
     cat <<EOF
 USAGE
-  bash amneziawg2.sh [OPTION]
+  bash amneziawg3x.sh [OPTION]
 
 OPTION
   -h, --help         Show help manual
