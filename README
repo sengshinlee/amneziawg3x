@@ -1,0 +1,25 @@
+Description
+  A bash script for Ubuntu to install AmneziaWG 2.0 and generate some interface configuration files for all platforms automatically (Dual-stack supported).
+
+Obfuscation Parameters
+  S1: 0 <= S1 <= 64, len(init) = 148 + S1, S1 + 56 != S2, recommended range is from 15 to 64 inclusive, default 20.
+  S2: 0 <= S2 <= 64, len(resp) = 92 + S2, recommended range is from 15 to 64 inclusive, default 50.
+  S3: 0 <= S3 <= 64, len(cookie) = 64 + S3, default 30.    // AmneziaWG 2.0 parameter
+  S4: 0 <= S4 <= 32, len(data) = payload + S4, default 15. // AmneziaWG 2.0 parameter
+  H1: Range<UInt32>, default 100000-200000.                // AmneziaWG 2.0 parameter
+  H2: Range<UInt32>, default 3000000-4000000.              // AmneziaWG 2.0 parameter
+  H3: Range<UInt32>, default 50000000-60000000.            // AmneziaWG 2.0 parameter
+  H4: Range<UInt32>, default 700000000-800000000.          // AmneziaWG 2.0 parameter
+  I1: Format <b hex_data>, default <r 128> or <b 0x100101000>.
+  I2-I5: Format <b hex_data>, optional.
+  Jc: Number of junk packets. 1 <= Jc <= 128, recommended range is from 4 to 10 inclusive, default 5.
+  Jmin: Minimum junk packet size. 0 < Jmin < Jmax, Jmin < 1280(*), recommended range is from 64 to 1024 inclusive, default 65.
+  Jmax: Maximum junk packet size. 0 < Jmin < Jmax <= 1280(*), recommended range is from 64 to 1024 inclusive, default 250.
+
+  Note
+    - H1/H2/H3/H4: Must be unique among each other, recommended range is from 5 to 2,147,483,647 inclusive.
+    - I1-I5: Details, look at the site (https://docs.amnezia.org/documentation/amnezia-wg/#how-it-works).
+    - (*) Assuming a basic internet connection with an MTU value of 1280.
+
+"WireGuard" and the "WireGuard" logo are registered trademarks of Jason A. Donenfeld (https://zx2c4.com).
+AmneziaWG 2.0 is based on WireGuard, changes and modifications made by Amnezia Organization (https://amnezia.org).
